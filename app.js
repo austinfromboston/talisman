@@ -1,33 +1,47 @@
-// NOTE:
-// When testing this demo you need to ensure that the domain you're hosting
-// it on is in the network section of the cache manifest (second argument)
-// or the long-poll may not work.
+var jsdom = require('jsdom'),
+    sys = require('sys'),
+    request = require('request'),
+    window = jsdom.jsdom().createWindow(),
+    jasmine = require('./jasmine-node'),
+    j = jasmine.locals;
 
-var Connect = require('./vendor/connect');
-var root = __dirname + "/public";
+jsdom.jQueryify(window, __dirname + '/vendor/jquery.js', function(window, jquery) {
+  window.jQuery('body').append("<div class='testing'>Hello World</div>");
+  sys.puts(window.jQuery(".testing").text());
+});
 
-var Backend = require('./broadcaster');
+var httpAgent = require('http-agent');
 
-// Create a server with no initial setup
-var Server = module.exports = Connect.createServer();
+var agent = httpAgent.create('www.google.com', ['finance', 'news', 'images']);
 
-// Add global filters
-Server.use("/",
-    Connect.responseTime(),
-    Connect.logger()
-);
+agent.addListener('next', function (e, agent) {
+  var window = jsdom.createWindow(agent.body);
+  jsdom.jQueryify(window, __dirname + '/vendor/jquery.js', function (window, jquery) {
+    runSuite(window);
+    agent.next();
+  });
+});
 
-// Serve dynamic responses
-Server.use("/stream",
-    Connect.bodyDecoder(),
-    Connect.pubsub(Backend)
-);
+agent.addListener('stop', function (agent) {
+  j.execute();
+  reporter.finalReport();
+  sys.puts('the agent has stopped');
+});
 
-// Serve static resources
-Server.use("/",
-    Connect.cacheManifest(root, ["http://localhost:3000/", "http://localhost:8080", "http://stackattack.heroku.com/"]),
-    Connect.conditionalGet(),
-    Connect.cache(),
-    Connect.gzip(),
-    Connect.staticProvider(root)
-);
+agent.start();
+
+var reporter = new jasmine.JsApiReporter()
+jasmine.getEnv().addReporter(reporter);
+
+function runSuite(window) {
+  var $ = window.jQuery;
+  // jQuery is now loaded on the jsdom window created from 'agent.body'
+  $('a').addClass('foo');
+  console.log( 'a:', $('a').size(), '  foos:', $('.foo').size());
+
+  j.describe('simple math', function() {
+    j.it("should compute", function() {
+      j.expect( $('a').size()).toEqual($('.foo').size());
+    });
+  });
+}
