@@ -1,0 +1,6 @@
+an attempt to use Jasmine and node.js for both server-side and client-side integration testing
+
+requires the following npm modules:
+jsdom
+http-agent
+request

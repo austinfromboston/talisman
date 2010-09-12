@@ -5,6 +5,7 @@ var jsdom = require('jsdom'),
     jasmine = require('./jasmine-node'),
     j = jasmine.locals;
 
+/*
 jsdom.jQueryify(window, __dirname + '/vendor/jquery.js', function(window, jquery) {
   window.jQuery('body').append("<div class='testing'>Hello World</div>");
   sys.puts(window.jQuery(".testing").text());
@@ -30,9 +31,6 @@ agent.addListener('stop', function (agent) {
 
 agent.start();
 
-var reporter = new jasmine.JsApiReporter()
-jasmine.getEnv().addReporter(reporter);
-
 function runSuite(window) {
   var $ = window.jQuery;
   // jQuery is now loaded on the jsdom window created from 'agent.body'
@@ -45,3 +43,24 @@ function runSuite(window) {
     });
   });
 }
+
+*/
+
+//jasmine.getEnv().on('complete', function() {
+//  reporter.finalReport();
+//});
+
+/*
+var reporter = new jasmine.JsApiReporter()
+jasmine.getEnv().addReporter(reporter);
+
+require(__dirname + '/spec/incantation.js');
+j.execute();
+
+setTimeout(function() {
+  reporter.finalReport();
+}, 10000);
+*/
+
+require('./spec/oath.js');
+
