@@ -50,7 +50,6 @@ function runSuite(window) {
 //  reporter.finalReport();
 //});
 
-/*
 var reporter = new jasmine.JsApiReporter()
 jasmine.getEnv().addReporter(reporter);
 
@@ -60,7 +59,6 @@ j.execute();
 setTimeout(function() {
   reporter.finalReport();
 }, 10000);
-*/
 
-require('./spec/oath.js');
+//require('./spec/oath.js');
 

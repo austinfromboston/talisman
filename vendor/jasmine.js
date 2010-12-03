@@ -556,6 +556,59 @@ var describe = function(description, specDefinitions) {
   return jasmine.getEnv().describe(description, specDefinitions);
 };
 
+var asyncDescribe = function( description, specDefinitions ) {
+  var env = jasmine.getEnv();
+  function asyncBeforeEach(description, action) {
+    var localComplete = false;
+    beforeEach( description, function() {
+        function onComplete() {
+          localComplete = true; 
+        }
+        runs(function() { action.call(env, onComplete)});
+        waitsFor( function() { return localComplete; } );
+    });
+  }
+
+  function asyncIt( description, action) {
+    it(description, function() {
+        function onComplete() {
+          localComplete = true; 
+        }
+      runs(function() {
+        action.call(env, onComplete);
+      });
+      waitsFor( function() { return localComplete; } );
+    });
+  }
+
+  var suite = new jasmine.Suite(env, description, specDefinitions, env.currentSuite);
+  var parentSuite = env.currentSuite;
+  if (parentSuite) {
+    parentSuite.add(suite);
+  } else {
+    env.currentRunner_.add(suite);
+  }
+
+  env.currentSuite = suite;
+
+  var declarationError = null;
+  try {
+    specDefinitions.call(suite, [{it: asyncIt, describe:asyncDescribe, beforeEach:asyncBeforeEach}]);
+  } catch(e) {
+    declarationError = e;
+  }
+
+  env.currentSuite = parentSuite;
+
+  if (declarationError) {
+    env.it("encountered a declaration exception", function() {
+      throw declarationError;
+    });
+  }
+
+  return suite;
+};
+
 /**
  * Disables a suite of specifications.  Used to disable some suites in a file, or files, temporarily during development.
  *

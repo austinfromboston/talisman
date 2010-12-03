@@ -7,7 +7,7 @@ jasmine.locals = {
 var localNames = [ 
   'spyOn', 'it', 'xit', 'expect', 'runs', 
   'waits', 'waitsFor', 'beforeEach', 'afterEach', 
-  'describe', 'xdescribe' ];
+  'describe', 'xdescribe', 'asyncDescribe' ];
 
 for(i in localNames) {
   var name = localNames[i];

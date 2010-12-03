@@ -6,6 +6,53 @@ for(key in jasmine.locals) {
 }
 
 
+/*
+var asyncDescribe = function( desc, specs ) {
+  function asyncBeforeEach(description, action) {
+    var localComplete = false;
+    beforeEach( description, function() {
+        function onComplete() {
+          localComplete = true; 
+        }
+        runs(function() { action.apply(jasmine.getEnv(), [onComplete])});
+        waitsFor( function() { return localComplete; } );
+    });
+  }
+
+  function asyncIt( description, action) {
+    var localComplete = false;
+    it(description, function() {
+        function onComplete() {
+          localComplete = true; 
+        }
+      runs(function() {
+        action.apply(jasmine.getEnv(), [onComplete]);
+      });
+      waitsFor( function() { return localComplete; } );
+    });
+  }
+
+  specs.apply(jasmine.getEnv(), [{it: asyncIt, describe:asyncDescribe, beforeEach:asyncBeforeEach}]);
+};
+*/
+
+/*
+asyncDescribe('a visit to Amazon.com', function(a) {
+  var currentPage;
+  a.beforeEach(function(onComplete) {
+    agent = new Visitor().visit('http://www.amazon.com');
+    agent.on('load', function(page) {
+      currentPage = page;
+      onComplete();
+      });
+  });
+  a.it("should show an ad for kindle", function(onComplete) {
+    expect(currentPage.body).toMatch(/Kindle/);
+      onComplete();
+  });
+});
+*/
+
 describe('a visit to Amazon.com', function() {
   var agent;
   beforeEach(function() {
@@ -29,6 +76,7 @@ describe('a visit to Amazon.com', function() {
       expect(page.body).toMatch("Books For You Moo");
     });
   });
+
   xdescribe("when i visit a book page", function() {
     beforeEach(function() {
       agent.on('load', function(page) {
